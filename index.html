@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title>Información Calendario</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .feriado {
+            background-color: red;
+        }
+
+        .feriado a {
+            background-color: red;
+        }
+
+        #esferiado {
+            font-weight: bolder;
+            color: green;
+        }
+
+        b {
+            color: red;
+            font-style: italic;
+        }
+
+        .contenedor-principal {
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        .fila {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 30px;
+        }
+
+        .columna {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .izquierda {
+            flex: 3;
+        }
+
+        .derecha {
+            flex: 1;
+        }
+
+        .informacion-dia {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 80px;
+        }
+
+        .informacion-dia p {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        .contenedor-calendario {
+            background-color: #eef6ff;
+            padding: 20px;
+            border-radius: 8px;
+            height: 100%;
+        }
+
+        #calendario {
+            font-size: 120%;
+            width: 100%;
+        }
+
+        #clima {
+            background-color: #e0f7fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        #clima p {
+            margin: 5px 0;
+            line-height: 1.2;
+        }
+
+        #lista-feriados {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            flex-grow: 1;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .temperatura-actual {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .info-clima {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .feriado-item {
+            padding: 6px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 3px;
+        }
+
+        .feriado-fecha {
+            font-weight: bold;
+            color: #e53935;
+        }
+
+        .feriado-motivo {
+            margin-top: 2px;
+            font-size: 14px;
+        }
+
+        .ui-datepicker table {
+            width: 100%;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contenedor-principal">
+
+        <div class="fila">
+
+            <div class="columna izquierda">
+                <div class="contenedor-calendario">
+                    <h3>Calendario</h3>
+                    <div id="calendario"></div>
+                </div>
+            </div>
+
+            <div class="columna derecha">
+
+                <div id="clima">
+                    <h3>Información del Clima</h3>
+                    <div id="info-clima" class="info-clima">
+                        <p>Cargando información del clima...</p>
+                    </div>
+                </div>
+
+                <div id="lista-feriados">
+                    <h3>Listado de Feriados</h3>
+                    <div id="feriados-contenedor">
+                        <p>Cargando listado de feriados...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="informacion-dia">
+            <div>
+                <h3>Información de Hoy</h3>
+                <p id="hoy"></p>
+                <p id="santoral"></p>
+            </div>
+            <div>
+                <h3>Información del día Seleccionado</h3>
+                <p id="esferiado"></p>
+                <p id="santorales"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $.datepicker.regional['es'] = {
+            closeText: 'Cerrar',
+            prevText: '< Ant',
+            nextText: 'Sig >',
+            currentText: 'Hoy',
+            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+            dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+            weekHeader: 'Sm',
+            dateFormat: 'dd-mm-yy',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: '',
+            beforeShowDay: verFeriado,
+            onSelect: verInfoDia
+        };
+        $(document).ready(function () {
+            $(function () {
+                $("#calendario").datepicker($.datepicker.regional["es"]);
+            });
+            $.getJSON('https://api.boostr.cl/holidays.json', verFeriados);
+            $.getJSON('https://api.boostr.cl/santorales.json', verSantos);
+            $.getJSON('https://api.boostr.cl/weather/SCIC.json', mostrarClima);
+            setTimeout(() => {
+                $("#calendario").datepicker("refresh");
+            }, 1000);
+
+        });
+        var santorales = null;
+        function verSantos(info) {
+            santorales = info;
+            var dias = { Monday: "Lunes", Tuesday: "Martes", Wednesday: "Miércoles", Thursday: "Jueves", Friday: "Viernes", Saturday: "Sábado", Sunday: "Domingo" };
+            var meses = { January: "Enero", February: "Febrero", March: "Marzo", April: "Abril", May: "Mayo", June: "Junio", July: "Julio", August: "Agosto", September: "Septiembre", October: "Octubre", November: "Noviembre", December: "Diciembre" };
+            var nombreDia = $.datepicker.formatDate('DD', $("#calendario").datepicker('getDate'));
+            var dia = $.datepicker.formatDate('dd', $("#calendario").datepicker('getDate'));
+            var nombreMes = $.datepicker.formatDate('MM', $("#calendario").datepicker('getDate'));
+            var mes = $.datepicker.formatDate('mm', $("#calendario").datepicker('getDate'));
+            var anio = $.datepicker.formatDate('yy', $("#calendario").datepicker('getDate'));
+            $("#hoy").text("Hoy es " + dias[nombreDia] + " " + dia + " de " + meses[nombreMes] + " del año " + anio);
+            var mesESP = meses[nombreMes].toLowerCase();
+            $("#santoral").text("Saluda a " + info.data[mesESP][dia - 1]);
+            $("#santorales").text("Santoral del día seleccionado: " + info.data[mesESP][dia - 1]);
+        }
+        var feriados = [];
+        var infoFeriados = [];
+        function verFeriados(info) {
+            info.data.forEach(fecha => {
+                var fechaOk = fecha.date.split("-");
+                var anio = parseInt(fechaOk[0]);
+                var mes = parseInt(fechaOk[1]);
+                var dia = parseInt(fechaOk[2]);
+                var fechita = new Date(anio, mes - 1, dia);
+                feriados.push(fechita.getDate() + '/' + (fechita.getMonth() + 1) + '/' + fechita.getFullYear());
+                infoFeriados.push({ "fecha": fecha.date, "motivo": fecha.title });
+            });
+
+            mostrarListadoFeriados();
+        }
+        function verFeriado(in_date) {
+            in_date = in_date.getDate() + '/' + (in_date.getMonth() + 1) + '/' + in_date.getFullYear();
+            if (feriados.indexOf(in_date) >= 0) {
+                return [true, "feriado", "Feriado"];
+            } else {
+                return [true, "", "Hábil"];
+            }
+        }
+        function verInfoDia(dia) {
+            var dias = dia.split("-");
+            var feriado = false;
+            dia = dias[2] + "-" + dias[1] + "-" + dias[0];
+            infoFeriados.forEach(data => {
+                if (data.fecha == dia) {
+                    $("#esferiado").text(data.motivo);
+                    feriado = true;
+                }
+            });
+            if (!feriado) {
+                $("#esferiado").text("Día Hábil :(");
+            }
+            actualizarSantoral(dias[0], dias[1], dias[2]);
+        }
+        function actualizarSantoral(dia, mes, anio) {
+            if (santorales) {
+                var mesesNombre = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                var mesNombre = mesesNombre[parseInt(mes) - 1];
+                var santoralDia = santorales.data[mesNombre][parseInt(dia) - 1];
+                $("#santorales").text("Santoral del día seleccionado: " + santoralDia);
+            }
+        }
+
+        function mostrarListadoFeriados() {
+            if (infoFeriados.length === 0) {
+                $("#feriados-contenedor").html("<p>No se encontraron feriados para mostrar.</p>");
+                return;
+            }
+
+            infoFeriados.sort(function (a, b) {
+                return a.fecha.localeCompare(b.fecha);
+            });
+
+            var html = "";
+
+            infoFeriados.forEach(function (feriado) {
+                var partesFecha = feriado.fecha.split("-");
+                var fechaFormateada = partesFecha[2] + "/" + partesFecha[1] + "/" + partesFecha[0];
+
+                html += `<div class="feriado-item">
+                    <div class="feriado-fecha">${fechaFormateada}</div>
+                    <div class="feriado-motivo">${feriado.motivo}</div>
+                </div>`;
+            });
+
+            $("#feriados-contenedor").html(html);
+        }
+
+        function mostrarClima(data) {
+            if (!data || data.status !== "success" || !data.data) {
+                $("#info-clima").html("<p>No se pudo cargar la información del clima.</p>");
+                return;
+            }
+
+            var climaData = data.data;
+            var temperatura = climaData.temperature;
+            var condicion = climaData.condition;
+            var humedad = climaData.humidity;
+            var ciudad = climaData.city;
+            var codigo = climaData.code;
+            var actualizadoA = climaData.updated_at;
+
+            var html = `
+                <div class="temperatura-actual">${temperatura}°C</div>
+                <p><strong>Condición:</strong> ${condicion}</p>
+                <p><strong>Humedad:</strong> ${humedad}%</p>
+                <p><strong>Ciudad:</strong> ${ciudad}</p>
+                <p><strong>Última actualización:</strong> ${actualizadoA}</p>
+                <p><small>Estación: ${codigo} (IP: 190.110.102.52)</small></p>
+            `;
+
+            $("#info-clima").html(html);
+        }
+    </script>
+</body>
+
+</html>
